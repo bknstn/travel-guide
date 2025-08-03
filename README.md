@@ -23,34 +23,39 @@ An AI-driven travel guide web application that asks "Who you are?" and "Where to
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - Anthropic API key
 
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd travel-guide
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp env.example .env.local
 ```
 
 4. Add your Anthropic API key to `.env.local`:
+
 ```
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ```
 
 5. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -90,6 +95,7 @@ src/
 Generates travel recommendations based on personality and destination.
 
 **Request Body:**
+
 ```json
 {
   "answers": [
@@ -102,11 +108,12 @@ Generates travel recommendations based on personality and destination.
 ```
 
 **Response:** Returns JSON array of place objects:
+
 ```json
 [
   {
     "name": "Place Name",
-    "city": "City", 
+    "city": "City",
     "country": "Country",
     "description": "...",
     "idealFor": "..."

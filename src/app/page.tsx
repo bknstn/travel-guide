@@ -1,40 +1,40 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import PersonalityQuiz from '@/components/PersonalityQuiz'
-import DestinationInput from '@/components/DestinationInput'
-import PlaceCard from '@/components/PlaceCard'
+import { useState } from 'react';
+import PersonalityQuiz from '@/components/PersonalityQuiz';
+import DestinationInput from '@/components/DestinationInput';
+import PlaceCard from '@/components/PlaceCard';
 
 export interface Answer {
-  questionId: number
-  value: string | number
+  questionId: number;
+  value: string | number;
 }
 
 export interface Place {
-  name: string
-  city: string
-  country: string
-  description: string
-  idealFor: string
+  name: string;
+  city: string;
+  country: string;
+  description: string;
+  idealFor: string;
 }
 
 export default function Home() {
-  const [answers, setAnswers] = useState<Answer[]>([])
-  const [places, setPlaces] = useState<Place[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAnswersChange = (newAnswers: Answer[]) => {
-    setAnswers(newAnswers)
-  }
+    setAnswers(newAnswers);
+  };
 
   const handleDestinationSubmit = async (place: string) => {
     if (answers.length < 5) {
-      alert('Please complete the personality quiz first')
-      return
+      alert('Please complete the personality quiz first');
+      return;
     }
 
-    setIsLoading(true)
-    setPlaces([])
+    setIsLoading(true);
+    setPlaces([]);
 
     try {
       const response = await fetch('/api/recommend', {
@@ -43,21 +43,21 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ answers, place }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to get recommendations')
+        throw new Error('Failed to get recommendations');
       }
 
-      const places = await response.json()
-      setPlaces(places)
+      const places = await response.json();
+      setPlaces(places);
     } catch (error) {
-      console.error('Error:', error)
-      alert('Failed to get recommendations. Please try again.')
+      console.error('Error:', error);
+      alert('Failed to get recommendations. Please try again.');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <main className="min-h-screen bg-gray-50 py-8 px-4">
@@ -65,14 +65,17 @@ export default function Home() {
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
           AI Travel Guide
         </h1>
-        
+
         <PersonalityQuiz onChange={handleAnswersChange} />
         <DestinationInput onSubmit={handleDestinationSubmit} />
-        
+
         {isLoading && (
           <div className="space-y-4">
             {[...Array(10)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl shadow p-6 animate-pulse">
+              <div
+                key={i}
+                className="bg-white rounded-2xl shadow p-6 animate-pulse"
+              >
                 <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                 <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
                 <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
@@ -81,7 +84,7 @@ export default function Home() {
             ))}
           </div>
         )}
-        
+
         {places.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold text-gray-900">
@@ -94,5 +97,5 @@ export default function Home() {
         )}
       </div>
     </main>
-  )
-} 
+  );
+}

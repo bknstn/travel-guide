@@ -1,26 +1,26 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
+import { useState } from 'react';
 
 interface DestinationInputProps {
-  onSubmit: (place: string) => void
+  onSubmit: (place: string) => void;
 }
 
 export default function DestinationInput({ onSubmit }: DestinationInputProps) {
-  const [destination, setDestination] = useState('')
+  const [destination, setDestination] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (destination.trim()) {
-      onSubmit(destination.trim())
+      onSubmit(destination.trim());
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSubmit(e)
+      handleSubmit(e);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow px-6 py-4">
@@ -45,5 +45,5 @@ export default function DestinationInput({ onSubmit }: DestinationInputProps) {
         </button>
       </form>
     </div>
-  )
-} 
+  );
+}

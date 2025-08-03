@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { Place } from '@/app/page'
+import { Place } from '@/app/page';
 
 interface PlaceCardProps {
-  place: Place
+  place: Place;
 }
 
 export default function PlaceCard({ place }: PlaceCardProps) {
@@ -15,16 +15,14 @@ export default function PlaceCard({ place }: PlaceCardProps) {
           {place.city}, {place.country}
         </span>
       </div>
-      
-      <p className="text-gray-700 mb-4 leading-relaxed">
-        {place.description}
-      </p>
-      
+
+      <p className="text-gray-700 mb-4 leading-relaxed">{place.description}</p>
+
       <div className="flex items-center">
         <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
           Ideal for: {place.idealFor}
         </span>
       </div>
     </div>
-  )
-} 
+  );
+}
