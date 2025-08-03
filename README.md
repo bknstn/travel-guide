@@ -1,6 +1,6 @@
 # AI Travel Guide
 
-An AI-driven travel guide web application that asks "Who you are?" and "Where to?", then returns ten personality-matched places to visit using Anthropic's Claude API.
+An AI-driven travel guide web application that returns ten personality-matched places to visit using Anthropic's Claude API.
 
 ## Features
 
