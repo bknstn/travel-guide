@@ -6,9 +6,9 @@ An AI-driven travel guide web application that asks "Who you are?" and "Where to
 
 - **Personality Quiz**: 5-question personality assessment with sliders, radio buttons, and text input
 - **Destination Input**: Simple text input for city or country
-- **AI Recommendations**: Streams 10 personalized travel recommendations from Claude
+- **AI Recommendations**: Returns 10 personalized travel recommendations from Claude
 - **Mobile-First Design**: Responsive UI built with Tailwind CSS
-- **Real-time Streaming**: Recommendations appear as they're generated
+- **Loading States**: Skeleton loaders while fetching recommendations
 
 ## Tech Stack
 
@@ -16,7 +16,8 @@ An AI-driven travel guide web application that asks "Who you are?" and "Where to
 - **TypeScript 5**
 - **Tailwind CSS 3**
 - **Anthropic Claude API**
-- **Vercel Edge Functions**
+- **SWR** for data fetching
+- **Jest & Testing Library** for testing
 
 ## Getting Started
 
@@ -61,6 +62,7 @@ npm run dev
 1. **Complete the Personality Quiz**: Answer 5 questions about your travel preferences
 2. **Enter Destination**: Type a city or country you want to visit
 3. **Get Recommendations**: Click "Generate Recommendations" to receive 10 personalized places
+4. **View Results**: Recommendations appear with loading states and beautiful cards
 
 ## Project Structure
 
@@ -69,15 +71,16 @@ src/
 ├── app/
 │   ├── globals.css
 │   ├── layout.tsx
-│   └── page.tsx              # Main page component
+│   ├── page.tsx              # Main page component
+│   └── api/
+│       └── recommend/
+│           └── route.ts      # API route for recommendations
 ├── components/
 │   ├── PersonalityQuiz.tsx   # Personality assessment
 │   ├── DestinationInput.tsx  # Destination input
 │   └── PlaceCard.tsx         # Individual place display
-├── lib/
-│   └── claude.ts             # Claude API client
-└── pages/api/
-    └── recommend.ts          # API route for recommendations
+└── lib/
+    └── claude.ts             # Claude API client
 ```
 
 ## API Endpoints
@@ -98,9 +101,17 @@ Generates travel recommendations based on personality and destination.
 }
 ```
 
-**Response:** Streams NDJSON with place objects:
+**Response:** Returns JSON array of place objects:
 ```json
-{"name": "Place Name", "city": "City", "country": "Country", "description": "...", "idealFor": "..."}
+[
+  {
+    "name": "Place Name",
+    "city": "City", 
+    "country": "Country",
+    "description": "...",
+    "idealFor": "..."
+  }
+]
 ```
 
 ## Deployment
