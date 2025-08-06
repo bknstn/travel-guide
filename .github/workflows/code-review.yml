@@ -1,0 +1,30 @@
+name: CodeRabbit AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  coderabbit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: CodeRabbit AI Review
+        uses: coderabbitai/coderabbit-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          debug: false
+          health_check_only: false
+          auto_review: true
+          bot_name: "coderabbitai[bot]"
+          review_simple_changes: false
+          review_comment_lgtm: false
+          openai_light_model: gpt-4o-mini
+          openai_heavy_model: gpt-4o
+          openai_timeout_ms: 120000
+          language: en
+
