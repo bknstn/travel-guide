@@ -3,18 +3,242 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #1d1d1f;
+  --secondary: #86868b;
+  --accent: #007aff;
+  --surface: #ffffff;
+  --border: #e5e5e7;
+  --success: #34c759;
+  --warning: #ff9500;
+  --error: #ff3b30;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #f5f5f7;
+    --secondary: #86868b;
+    --accent: #0a84ff;
+    --surface: #1c1c1e;
+    --border: #38383a;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --error: #ff453a;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+
+  input, textarea, select {
+    background-color: transparent;
+  }
+}
+
+@layer components {
+  .apple-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(16px);
+  }
+  
+  .apple-button {
+    background-color: var(--accent);
+    color: white;
+    font-weight: 500;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    transition: all 0.2s ease;
+    transform: scale(1);
+    outline: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .apple-button:hover {
+    background-color: rgba(0, 122, 255, 0.9);
+  }
+  
+  .apple-button:active {
+    transform: scale(0.95);
+  }
+  
+  .apple-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px rgba(0, 122, 255, 0.2);
+  }
+  
+  .apple-input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    font-size: 1.125rem;
+    transition: all 0.2s ease;
+  }
+  
+  .apple-input::placeholder {
+    color: var(--secondary);
+  }
+  
+  .apple-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+}
+
+/* Custom slider styles - More specific to override Tailwind */
+input[type="range"].slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+  box-sizing: border-box;
+}
+
+input[type="range"].slider-thumb::-webkit-slider-track {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  border: none;
+}
+
+input[type="range"].slider-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 3px solid var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  margin-top: -7px;
+}
+
+input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"].slider-thumb::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  border: none;
+}
+
+input[type="range"].slider-thumb::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 3px solid var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+input[type="range"].slider-thumb::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Additional slider track styling for better visibility */
+input[type="range"].slider-thumb:focus {
+  outline: none;
+}
+
+input[type="range"].slider-thumb:focus::-webkit-slider-track {
+  background: var(--accent);
+  opacity: 0.3;
+}
+
+input[type="range"].slider-thumb:focus::-moz-range-track {
+  background: var(--accent);
+  opacity: 0.3;
+}
+
+/* Ensure slider tracks are visible in all browsers */
+input[type="range"].slider-thumb {
+  background: linear-gradient(to right, var(--border) 0%, var(--border) 100%);
+}
+
+/* Custom track fill based on value */
+input[type="range"].slider-thumb::-webkit-slider-runnable-track {
+  background: var(--border);
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+  width: 100%;
+}
+
+input[type="range"].slider-thumb::-moz-range-track {
+  background: var(--border);
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+  width: 100%;
+}
+
+/* Normalize all slider tracks to same visual length */
+input[type="range"].slider-thumb {
+  min-width: 200px;
+  width: 200px !important;
+  max-width: 200px;
+}
+
+/* Force consistent track appearance across all browsers */
+input[type="range"].slider-thumb::-webkit-slider-runnable-track {
+  background: var(--border);
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+  width: 200px !important;
+  min-width: 200px;
+  max-width: 200px;
+}
+
+input[type="range"].slider-thumb::-moz-range-track {
+  background: var(--border);
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+  width: 200px !important;
+  min-width: 200px;
+  max-width: 200px;
+}
+
+/* Additional rules to ensure consistent sizing */
+input[type="range"].slider-thumb {
+  flex-shrink: 0;
+  flex-grow: 0;
 }

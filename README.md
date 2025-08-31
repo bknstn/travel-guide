@@ -1,4 +1,4 @@
-# AI Travel Guide
+# Your Travel Guide
 
 An AI-driven travel guide web application that returns ten personality-matched places to visit using Anthropic's Claude API.
 

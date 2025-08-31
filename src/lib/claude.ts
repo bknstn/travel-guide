@@ -52,7 +52,7 @@ export async function getRecommendations(answers: Answer[], place: string) {
     console.log('Built prompt:', prompt);
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       messages: [
         {

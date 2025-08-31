@@ -23,25 +23,33 @@ export default function DestinationInput({ onSubmit }: DestinationInputProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow px-6 py-4">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">Where to?</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="apple-card p-4">
+      <div className="text-center mb-4">
+        <h2 className="text-lg font-medium tracking-tight text-foreground mb-1">
+          Where to?
+        </h2>
+        <p className="text-xs text-secondary">
+          City, country, or region
+        </p>
+      </div>
+      
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <input
             type="text"
-            placeholder="City or country"
+            placeholder="e.g., Tokyo, Japan"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="w-full rounded-full border px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-200 text-center"
           />
         </div>
         <button
           type="submit"
           disabled={!destination.trim()}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-full font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-accent text-white py-2 px-4 rounded-lg font-medium hover:bg-accent/90 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm"
         >
-          Generate Recommendations
+          Get Recommendations
         </button>
       </form>
     </div>
