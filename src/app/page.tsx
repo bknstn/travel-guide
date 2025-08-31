@@ -60,39 +60,55 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
-          AI Travel Guide
-        </h1>
+    <main className="h-screen bg-background p-4 overflow-hidden">
+      <div className="h-full max-w-4xl mx-auto flex flex-col">
+        {/* Header - More Compact */}
+        <div className="text-center py-3">
+          <h1 className="text-3xl font-medium tracking-tight text-foreground mb-1">
+            Your Travel Guide
+          </h1>
+        </div>
 
-        <PersonalityQuiz onChange={handleAnswersChange} />
-        <DestinationInput onSubmit={handleDestinationSubmit} />
+        {/* Main Content - Centered Single Column */}
+        <div className="flex-1 flex flex-col items-center justify-center space-y-6">
+          {/* Personality Quiz */}
+          <div className="w-full max-w-2xl">
+            <PersonalityQuiz onChange={handleAnswersChange} />
+          </div>
 
+          {/* Destination Input */}
+          <div className="w-full max-w-2xl">
+            <DestinationInput onSubmit={handleDestinationSubmit} />
+          </div>
+        </div>
+
+        {/* Results Section - Full Width Below */}
         {isLoading && (
-          <div className="space-y-4">
-            {[...Array(10)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl shadow p-6 animate-pulse"
-              >
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-                <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-5/6"></div>
-              </div>
-            ))}
+          <div className="w-full text-center py-4">
+            <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-accent"></div>
+            <p className="mt-2 text-sm text-secondary">Finding your perfect destinations...</p>
           </div>
         )}
 
         {places.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Your Personalized Recommendations
+          <div className="w-full space-y-4 overflow-y-auto max-h-64">
+            <h2 className="text-lg font-medium text-foreground text-center">
+              Your Recommendations
             </h2>
-            {places.map((place, index) => (
-              <PlaceCard key={index} place={place} />
-            ))}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {places.map((place, index) => (
+                <PlaceCard key={index} place={place} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!isLoading && places.length === 0 && (
+          <div className="w-full text-center py-4">
+            <div className="text-center space-y-3 text-secondary">
+              <div className="text-4xl">✈️</div>
+              <p className="text-base">Complete the quiz and enter a destination</p>
+            </div>
           </div>
         )}
       </div>

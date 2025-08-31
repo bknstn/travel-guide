@@ -8,20 +8,29 @@ interface PlaceCardProps {
 
 export default function PlaceCard({ place }: PlaceCardProps) {
   return (
-    <div className="bg-white rounded-2xl shadow p-6 transition-transform hover:-translate-y-1">
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">{place.name}</h3>
-        <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-          {place.city}, {place.country}
-        </span>
-      </div>
+    <div className="apple-card p-3 transition-all duration-300 hover:scale-102 hover:shadow-md">
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="space-y-1">
+          <h3 className="text-base font-medium tracking-tight text-foreground leading-tight">
+            {place.name}
+          </h3>
+          <span className="inline-block text-xs text-secondary bg-border/50 px-2 py-1 rounded-full font-medium">
+            {place.city}, {place.country}
+          </span>
+        </div>
 
-      <p className="text-gray-700 mb-4 leading-relaxed">{place.description}</p>
+        {/* Description */}
+        <p className="text-xs text-secondary leading-relaxed overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          {place.description}
+        </p>
 
-      <div className="flex items-center">
-        <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-          Ideal for: {place.idealFor}
-        </span>
+        {/* Ideal For */}
+        <div className="pt-1">
+          <span className="inline-block text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">
+            {place.idealFor}
+          </span>
+        </div>
       </div>
     </div>
   );
