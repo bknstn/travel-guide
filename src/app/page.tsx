@@ -55,8 +55,8 @@ export default function Home() {
   };
 
   return (
-    <main className="h-screen bg-background p-4 overflow-hidden">
-      <div className="h-full max-w-4xl mx-auto flex flex-col">
+    <main className="min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto">
         {/* Header - More Compact */}
         <div className="text-center py-3">
           <h1 className="text-3xl font-medium tracking-tight text-foreground mb-1">
@@ -65,7 +65,9 @@ export default function Home() {
         </div>
 
         {/* Main Content - Centered Single Column */}
-        <div className="flex-1 flex flex-col items-center justify-center space-y-6">
+        <div className={`flex flex-col items-center space-y-6 ${
+          places.length === 0 ? 'justify-center min-h-[calc(100vh-8rem)]' : 'pb-8'
+        }`}>
           {/* Personality Quiz */}
           <div className="w-full max-w-2xl">
             <PersonalityQuiz onChange={handleAnswersChange} />
@@ -75,34 +77,36 @@ export default function Home() {
           <div className="w-full max-w-2xl">
             <DestinationInput onSubmit={handleDestinationSubmit} />
           </div>
+
+          {/* Loading State */}
+          {isLoading && (
+            <div className="w-full text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-accent"></div>
+              <p className="mt-2 text-sm text-secondary">Finding your perfect destinations...</p>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!isLoading && places.length === 0 && (
+            <div className="w-full text-center py-8">
+              <div className="text-center space-y-3 text-secondary">
+                <div className="text-4xl">✈️</div>
+                <p className="text-base">Enter a destination to get recommendations</p>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Results Section - Full Width Below */}
-        {isLoading && (
-          <div className="w-full text-center py-4">
-            <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-accent"></div>
-            <p className="mt-2 text-sm text-secondary">Finding your perfect destinations...</p>
-          </div>
-        )}
-
+        {/* Results Section - Full Width Below, Separate from Main Content */}
         {places.length > 0 && (
-          <div className="w-full space-y-4 overflow-y-auto max-h-64">
-            <h2 className="text-lg font-medium text-foreground text-center">
+          <div className="w-full space-y-6 mt-8">
+            <h2 className="text-xl font-medium text-foreground text-center">
               Your Recommendations
             </h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pb-8">
               {places.map((place, index) => (
                 <PlaceCard key={index} place={place} />
               ))}
-            </div>
-          </div>
-        )}
-
-        {!isLoading && places.length === 0 && (
-          <div className="w-full text-center py-4">
-            <div className="text-center space-y-3 text-secondary">
-              <div className="text-4xl">✈️</div>
-              <p className="text-base">Enter a destination to get recommendations</p>
             </div>
           </div>
         )}
