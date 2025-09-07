@@ -7,6 +7,17 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        secondary: 'var(--secondary)',
+        accent: 'var(--accent)',
+        surface: 'var(--surface)',
+        border: 'var(--border)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        error: 'var(--error)',
+      },
       fontFamily: {
         sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
