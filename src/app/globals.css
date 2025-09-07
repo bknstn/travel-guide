@@ -176,31 +176,22 @@ input[type="range"].slider-thumb:focus {
   outline: none;
 }
 
-input[type="range"].slider-thumb:focus::-webkit-slider-track {
-  background: var(--accent);
-  opacity: 0.3;
-}
-
-input[type="range"].slider-thumb:focus::-moz-range-track {
-  background: var(--accent);
-  opacity: 0.3;
-}
+/* Remove legacy focus track color overrides; the thumb shows focus */
 
 /* Ensure slider tracks are visible in all browsers */
 
-/* Custom track fill based on value */
+/* Single WebKit track: use --progress to color the filled portion */
 input[type="range"].slider-thumb::-webkit-slider-runnable-track {
-  background: var(--border);
   height: 6px;
   border-radius: 3px;
   border: none;
-}
-
-input[type="range"].slider-thumb::-moz-range-track {
-  background: var(--border);
-  height: 6px;
-  border-radius: 3px;
-  border: none;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) var(--progress, 0%),
+    var(--border) var(--progress, 0%),
+    var(--border) 100%
+  );
 }
 
 /* Normalize all slider tracks to same visual length */
@@ -210,21 +201,19 @@ input[type="range"].slider-thumb {
   max-width: 200px;
 }
 
-/* Force consistent track appearance across all browsers */
-/* Width control should be on the input element, not pseudo-tracks */
-input[type="range"].slider-thumb::-webkit-slider-runnable-track {
-  background: var(--border);
+/* Firefox: transparent track + progress segment styled */
+input[type="range"].slider-thumb::-moz-range-track {
   height: 6px;
   border-radius: 3px;
   border: none;
+  background: transparent;
 }
 
-/* Width control should be on the input element, not pseudo-tracks */
-input[type="range"].slider-thumb::-moz-range-track {
-  background: var(--border);
+input[type="range"].slider-thumb::-moz-range-progress {
   height: 6px;
   border-radius: 3px;
   border: none;
+  background: var(--accent);
 }
 
 /* Additional rules to ensure consistent sizing */

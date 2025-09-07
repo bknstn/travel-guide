@@ -117,15 +117,8 @@ export default function PersonalityQuiz({ onChange }: PersonalityQuizProps) {
                       max={question.max}
                       defaultValue={Math.ceil((question.min! + question.max!) / 2)}
                       className="w-[200px] h-1.5 rounded-full appearance-none cursor-pointer slider-thumb"
-                      onChange={(e) =>
-                        handleAnswerChange(question.id, parseInt(e.target.value))
-                      }
-                    />
-                    {/* Visual track indicator - normalized for non-zero mins */}
-                    <div
-                      className="absolute top-0 left-0 h-1.5 bg-accent/30 rounded-full pointer-events-none"
                       style={{
-                        width: `${
+                        ["--progress" as any]: `${
                           Math.min(
                             100,
                             Math.max(
@@ -136,15 +129,19 @@ export default function PersonalityQuiz({ onChange }: PersonalityQuizProps) {
                                     ((answers.find((a) => a.questionId === question.id)?.value as number)
                                       ?? Math.ceil((question.min! + question.max!) / 2)
                                     ) - question.min!
-                                  )
-                                  / Math.max(1, (question.max! - question.min!))
+                                  ) /
+                                  Math.max(1, question.max! - question.min!)
                                 ) * 100
                               )
                             )
                           )
                         }%`,
                       }}
+                      onChange={(e) =>
+                        handleAnswerChange(question.id, parseInt(e.target.value))
+                      }
                     />
+                    
                   </div>
                   <span className="text-xs text-accent font-medium min-w-[80px] text-right">
                     {getSliderLabel(
