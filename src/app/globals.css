@@ -118,14 +118,7 @@ input[type="range"].slider-thumb {
   box-sizing: border-box;
 }
 
-input[type="range"].slider-thumb::-webkit-slider-track {
-  width: 100%;
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  cursor: pointer;
-  border: none;
-}
+/* Use only runnable-track for WebKit engines */
 
 input[type="range"].slider-thumb::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -146,14 +139,7 @@ input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-input[type="range"].slider-thumb::-moz-range-track {
-  width: 100%;
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  cursor: pointer;
-  border: none;
-}
+/* Single definition per engine: Firefox track */
 
 input[type="range"].slider-thumb::-moz-range-thumb {
   height: 20px;
@@ -194,7 +180,6 @@ input[type="range"].slider-thumb::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 3px;
   border: none;
-  width: 100%;
 }
 
 input[type="range"].slider-thumb::-moz-range-track {
@@ -202,7 +187,6 @@ input[type="range"].slider-thumb::-moz-range-track {
   height: 6px;
   border-radius: 3px;
   border: none;
-  width: 100%;
 }
 
 /* Normalize all slider tracks to same visual length */
@@ -213,24 +197,20 @@ input[type="range"].slider-thumb {
 }
 
 /* Force consistent track appearance across all browsers */
+/* Width control should be on the input element, not pseudo-tracks */
 input[type="range"].slider-thumb::-webkit-slider-runnable-track {
   background: var(--border);
   height: 6px;
   border-radius: 3px;
   border: none;
-  width: 200px !important;
-  min-width: 200px;
-  max-width: 200px;
 }
 
+/* Width control should be on the input element, not pseudo-tracks */
 input[type="range"].slider-thumb::-moz-range-track {
   background: var(--border);
   height: 6px;
   border-radius: 3px;
   border: none;
-  width: 200px !important;
-  min-width: 200px;
-  max-width: 200px;
 }
 
 /* Additional rules to ensure consistent sizing */
