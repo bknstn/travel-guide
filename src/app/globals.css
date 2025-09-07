@@ -114,7 +114,6 @@ input[type="range"].slider-thumb {
   background: transparent;
   height: 6px;
   border-radius: 3px;
-  background: var(--border);
   outline: none;
   box-sizing: border-box;
 }
@@ -188,9 +187,6 @@ input[type="range"].slider-thumb:focus::-moz-range-track {
 }
 
 /* Ensure slider tracks are visible in all browsers */
-input[type="range"].slider-thumb {
-  background: linear-gradient(to right, var(--border) 0%, var(--border) 100%);
-}
 
 /* Custom track fill based on value */
 input[type="range"].slider-thumb::-webkit-slider-runnable-track {
