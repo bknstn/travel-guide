@@ -121,11 +121,30 @@ export default function PersonalityQuiz({ onChange }: PersonalityQuizProps) {
                         handleAnswerChange(question.id, parseInt(e.target.value))
                       }
                     />
-                    {/* Visual track indicator - normalized to same length */}
-                    <div className="absolute top-0 left-0 h-1.5 bg-accent/30 rounded-full pointer-events-none" 
-                         style={{ 
-                           width: `${((answers.find((a) => a.questionId === question.id)?.value as number) || Math.ceil((question.min! + question.max!) / 2)) / question.max! * 100}%` 
-                         }} />
+                    {/* Visual track indicator - normalized for non-zero mins */}
+                    <div
+                      className="absolute top-0 left-0 h-1.5 bg-accent/30 rounded-full pointer-events-none"
+                      style={{
+                        width: `${
+                          Math.min(
+                            100,
+                            Math.max(
+                              0,
+                              (
+                                (
+                                  (
+                                    ((answers.find((a) => a.questionId === question.id)?.value as number)
+                                      ?? Math.ceil((question.min! + question.max!) / 2)
+                                    ) - question.min!
+                                  )
+                                  / Math.max(1, (question.max! - question.min!))
+                                ) * 100
+                              )
+                            )
+                          )
+                        }%`,
+                      }}
+                    />
                   </div>
                   <span className="text-xs text-accent font-medium min-w-[80px] text-right">
                     {getSliderLabel(
