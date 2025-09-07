@@ -1,6 +1,6 @@
 # Contributing to Your Travel Guide
 
-Thank you for your interest in contributing to AI Travel Guide! This document provides guidelines for contributing to this project.
+Thank you for your interest in contributing to Your Travel Guide! This document provides guidelines for contributing to this project.
 
 ## Getting Started
 
