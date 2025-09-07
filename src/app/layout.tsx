@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AI Travel Guide',
+  title: 'Your Travel Guide',
   description:
     'Get personalized travel recommendations based on your personality',
 };
