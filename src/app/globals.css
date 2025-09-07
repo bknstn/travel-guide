@@ -139,6 +139,13 @@ input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* Accessible keyboard focus ring on slider thumb */
+input[type="range"].slider-thumb:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 6px rgba(0, 122, 255, 0.5);
+}
+
 /* Single definition per engine: Firefox track */
 
 input[type="range"].slider-thumb::-moz-range-thumb {
@@ -155,6 +162,13 @@ input[type="range"].slider-thumb::-moz-range-thumb {
 input[type="range"].slider-thumb::-moz-range-thumb:hover {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Accessible keyboard focus ring on slider thumb (Firefox) */
+input[type="range"].slider-thumb:focus-visible::-moz-range-thumb {
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 6px rgba(0, 122, 255, 0.5);
 }
 
 /* Additional slider track styling for better visibility */
