@@ -28,11 +28,6 @@ export default function Home() {
   };
 
   const handleDestinationSubmit = async (place: string) => {
-    if (answers.length < 5) {
-      alert('Please complete the personality quiz first');
-      return;
-    }
-
     setIsLoading(true);
     setPlaces([]);
 
@@ -107,7 +102,7 @@ export default function Home() {
           <div className="w-full text-center py-4">
             <div className="text-center space-y-3 text-secondary">
               <div className="text-4xl">✈️</div>
-              <p className="text-base">Complete the quiz and enter a destination</p>
+              <p className="text-base">Enter a destination to get recommendations</p>
             </div>
           </div>
         )}
