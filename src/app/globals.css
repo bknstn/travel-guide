@@ -3,47 +3,69 @@
 @tailwind utilities;
 
 :root {
-  --background: #fafafa;
-  --foreground: #1d1d1f;
-  --secondary: #86868b;
-  --accent: #007aff;
-  --surface: #ffffff;
-  --border: #e5e5e7;
-  --success: #34c759;
-  --warning: #ff9500;
-  --error: #ff3b30;
+  --background: #f4efe6;
+  --foreground: #141414;
+  --secondary: #5f5a52;
+  --accent: #d96b4a;
+  --accent-2: #1e6f6a;
+  --surface: rgba(255, 250, 244, 0.82);
+  --surface-strong: #fff8f0;
+  --border: rgba(20, 20, 20, 0.12);
+  --success: #2f855a;
+  --warning: #b7791f;
+  --error: #b83232;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #000000;
-    --foreground: #f5f5f7;
-    --secondary: #86868b;
-    --accent: #0a84ff;
-    --surface: #1c1c1e;
-    --border: #38383a;
-    --success: #30d158;
-    --warning: #ff9f0a;
-    --error: #ff453a;
+    --background: #0f0d0b;
+    --foreground: #f5efe7;
+    --secondary: #b8ada1;
+    --accent: #ef8b67;
+    --accent-2: #55b2a9;
+    --surface: rgba(26, 22, 19, 0.82);
+    --surface-strong: #181411;
+    --border: rgba(245, 239, 231, 0.12);
+    --success: #4ade80;
+    --warning: #f6ad55;
+    --error: #fc8181;
   }
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   * {
     border-color: var(--border);
   }
   
   body {
-    background-color: var(--background);
+    min-height: 100vh;
+    font-family:
+      'Avenir Next',
+      'Segoe UI',
+      'Helvetica Neue',
+      Arial,
+      sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(217, 107, 74, 0.22), transparent 32%),
+      radial-gradient(circle at top right, rgba(30, 111, 106, 0.18), transparent 30%),
+      linear-gradient(180deg, #f7f1e8 0%, #f4efe6 42%, #eee6da 100%);
     color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  ::selection {
+    background: rgba(217, 107, 74, 0.22);
+  }
+
   h1, h2, h3, h4, h5, h6 {
-    font-weight: 500;
-    letter-spacing: -0.025em;
+    font-weight: 600;
+    letter-spacing: -0.04em;
   }
 
   input, textarea, select {
@@ -52,172 +74,63 @@
 }
 
 @layer components {
-  .apple-card {
-    background-color: var(--surface);
+  .glass-card {
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 1.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(16px);
+    box-shadow:
+      0 18px 50px rgba(20, 20, 20, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    backdrop-filter: blur(18px);
   }
   
-  .apple-button {
-    background-color: var(--accent);
+  .hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--accent), #f09a62);
     color: white;
-    font-weight: 500;
-    padding: 1rem 2rem;
-    border-radius: 1rem;
-    transition: all 0.2s ease;
-    transform: scale(1);
+    font-weight: 600;
+    padding: 1rem 1.4rem;
+    border-radius: 999px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 18px 35px rgba(217, 107, 74, 0.26);
     outline: none;
     border: none;
     cursor: pointer;
   }
   
-  .apple-button:hover {
-    background-color: rgba(0, 122, 255, 0.9);
+  .hero-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 20px 42px rgba(217, 107, 74, 0.32);
   }
   
-  .apple-button:active {
-    transform: scale(0.95);
+  .hero-button:active {
+    transform: translateY(0);
   }
   
-  .apple-button:focus {
+  .hero-button:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px rgba(0, 122, 255, 0.2);
+    box-shadow: 0 0 0 2px var(--accent), 0 0 0 6px rgba(217, 107, 74, 0.2);
   }
   
-  .apple-input {
-    width: 100%;
-    padding: 1rem 1.5rem;
-    background-color: var(--surface);
+  .ghost-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 1.4rem;
+    border-radius: 999px;
     border: 1px solid var(--border);
-    border-radius: 1rem;
-    font-size: 1.125rem;
-    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.55);
+    color: var(--foreground);
+    font-weight: 600;
+    transition: transform 0.2s ease, background 0.2s ease;
   }
-  
-  .apple-input::placeholder {
-    color: var(--secondary);
+
+  .ghost-button:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.82);
   }
-  
-  .apple-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px var(--accent);
-  }
-}
-
-/* Custom slider styles - More specific to override Tailwind */
-input[type="range"].slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  height: 6px;
-  border-radius: 3px;
-  outline: none;
-  box-sizing: border-box;
-}
-
-/* Use only runnable-track for WebKit engines */
-
-input[type="range"].slider-thumb::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  border: 3px solid var(--surface);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
-  margin-top: -7px;
-}
-
-input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Accessible keyboard focus ring on slider thumb */
-input[type="range"].slider-thumb:focus-visible::-webkit-slider-thumb {
-  box-shadow:
-    0 0 0 3px var(--surface),
-    0 0 0 6px rgba(0, 122, 255, 0.5);
-}
-
-/* Single definition per engine: Firefox track */
-
-input[type="range"].slider-thumb::-moz-range-thumb {
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  border: 3px solid var(--surface);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
-}
-
-input[type="range"].slider-thumb::-moz-range-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Accessible keyboard focus ring on slider thumb (Firefox) */
-input[type="range"].slider-thumb:focus-visible::-moz-range-thumb {
-  box-shadow:
-    0 0 0 3px var(--surface),
-    0 0 0 6px rgba(0, 122, 255, 0.5);
-}
-
-/* Additional slider track styling for better visibility */
-input[type="range"].slider-thumb:focus {
-  outline: none;
-}
-
-/* Remove legacy focus track color overrides; the thumb shows focus */
-
-/* Ensure slider tracks are visible in all browsers */
-
-/* Single WebKit track: use --progress to color the filled portion */
-input[type="range"].slider-thumb::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 3px;
-  border: none;
-  background: linear-gradient(
-    to right,
-    var(--accent) 0%,
-    var(--accent) var(--progress, 0%),
-    var(--border) var(--progress, 0%),
-    var(--border) 100%
-  );
-}
-
-/* Normalize all slider tracks to same visual length */
-input[type="range"].slider-thumb {
-  min-width: 200px;
-  width: 200px !important;
-  max-width: 200px;
-}
-
-/* Firefox: transparent track + progress segment styled */
-input[type="range"].slider-thumb::-moz-range-track {
-  height: 6px;
-  border-radius: 3px;
-  border: none;
-  background: transparent;
-}
-
-input[type="range"].slider-thumb::-moz-range-progress {
-  height: 6px;
-  border-radius: 3px;
-  border: none;
-  background: var(--accent);
-}
-
-/* Additional rules to ensure consistent sizing */
-input[type="range"].slider-thumb {
-  flex-shrink: 0;
-  flex-grow: 0;
 }

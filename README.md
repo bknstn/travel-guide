@@ -1,152 +1,259 @@
-# Your Travel Guide
+# Travel Guide Bot
 
-An AI-driven travel guide web application that returns ten personality-matched places to visit using Anthropic's Claude API.
+Telegram bot for selling travel guide PDFs with:
 
-## Features
+- Instagram deep links into the bot
+- free preview PDFs before purchase
+- Tribute payment links and webhook confirmation
+- automatic PDF delivery in Telegram DM
+- a small ops page for purchase and delivery retries
+- VPS-first deployment with local Postgres and offsite backups
 
-- **Personality Quiz**: 5-question personality assessment with sliders, radio buttons, and text input
-- **Destination Input**: Simple text input for city or country
-- **AI Recommendations**: Returns 10 personalized travel recommendations from Claude
-- **Mobile-First Design**: Responsive UI built with Tailwind CSS
-- **Loading States**: Skeleton loaders while fetching recommendations
+The product/infra plan is documented in [travel-guide-bot.md](./travel-guide-bot.md).
 
 ## Tech Stack
 
-- **Next.js 15** with App Router
-- **TypeScript 5**
-- **Tailwind CSS 3**
-- **Anthropic Claude API**
-- **SWR** for data fetching
-- **Jest & Testing Library** for testing
+- `Next.js 15` with App Router
+- `TypeScript`
+- `grammy` for Telegram bot handling
+- `Postgres` via `pg`
+- `Anthropic Claude` for optional guide selection help
+- `Docker Compose + Caddy` for VPS deployment
 
-## Getting Started
+## What’s In The Repo
 
-### Prerequisites
+- Public site:
+  - `/` landing page with Telegram CTA
+  - `/support`
+  - `/privacy`
+- Internal page:
+  - `/ops` purchase and delivery dashboard
+- Webhooks:
+  - `POST /api/telegram/webhook`
+  - `POST /api/tribute/webhook`
+  - `GET /api/health`
+- Runtime:
+  - guide catalog in code
+  - local PDF/cover asset lookup
+  - Tribute signature verification
+  - Postgres-backed purchases and delivery jobs
+  - worker loop for retrying PDF delivery
 
-- Node.js 18+
-- npm or yarn
-- Anthropic API key
+## Project Structure
 
-### Installation
-
-1. Clone the repository:
-
-```bash
-git clone <repository-url>
-cd travel-guide
+```text
+src/
+├── app/
+│   ├── api/
+│   │   ├── health/route.ts
+│   │   ├── telegram/webhook/route.ts
+│   │   └── tribute/webhook/route.ts
+│   ├── ops/page.tsx
+│   ├── privacy/page.tsx
+│   ├── support/page.tsx
+│   └── page.tsx
+├── components/
+│   └── landing/TelegramLanding.tsx
+├── lib/
+│   ├── bot.ts
+│   ├── catalog.ts
+│   ├── claude.ts
+│   ├── db.ts
+│   ├── delivery.ts
+│   ├── guide-assets.ts
+│   ├── tribute.ts
+│   └── types.ts
+└── worker.ts
 ```
 
-2. Install dependencies:
+## Guide Assets
+
+Guide metadata is code-managed in [`src/lib/catalog.ts`](./src/lib/catalog.ts).
+
+Each guide expects a local folder:
+
+```text
+data/guides/<slug>/
+├── cover.jpg
+├── preview.pdf
+└── full.pdf
+```
+
+At runtime the app reads assets from:
+
+- `GUIDES_ROOT` if set
+- otherwise `GUIDE_ASSETS_DIR`
+- otherwise `./data/guides`
+
+If preview/full files are missing, Telegram delivery will fail for that guide.
+
+## Environment Variables
+
+Copy `env.example` to `.env` for Docker/VPS deployment.
+
+Main variables:
+
+- `APP_BASE_URL`
+- `APP_DOMAIN`
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_BOT_USERNAME`
+- `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME`
+- `TELEGRAM_WEBHOOK_SECRET`
+- `TRIBUTE_API_KEY`
+- `ANTHROPIC_API_KEY`
+- `SUPPORT_EMAIL`
+- `NEXT_PUBLIC_SUPPORT_EMAIL`
+- `DATABASE_URL`
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `GUIDES_ROOT`
+- `GUIDE_ASSETS_DIR`
+- `BACKUP_OUTPUT_DIR`
+- `OPS_BASIC_AUTH_USER`
+- `OPS_BASIC_AUTH_PASSWORD`
+- `RESTIC_REPOSITORY`
+- `RESTIC_PASSWORD`
+- `B2_ACCOUNT_ID`
+- `B2_ACCOUNT_KEY`
+
+Notes:
+
+- `ANTHROPIC_API_KEY` is optional if you want the bot’s “help me choose” flow to use Claude. Without it, the app falls back to deterministic matching.
+- `OPS_BASIC_AUTH_USER` and `OPS_BASIC_AUTH_PASSWORD` protect `/ops` through [`middleware.ts`](./middleware.ts).
+- `NEXT_PUBLIC_*` values are for public page links/text. Server runtime still uses the non-public variables.
+
+## Local Development
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. Set up environment variables:
-
-```bash
-cp env.example .env.local
-```
-
-4. Add your Anthropic API key to `.env.local`:
-
-```
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
-```
-
-5. Run the development server:
+Run the web app:
 
 ```bash
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Usage
-
-1. **Complete the Personality Quiz**: Answer 5 questions about your travel preferences
-2. **Enter Destination**: Type a city or country you want to visit
-3. **Get Recommendations**: Click "Generate Recommendations" to receive 10 personalized places
-4. **View Results**: Recommendations appear with loading states and beautiful cards
-
-## Project Structure
-
-```
-src/
-├── app/
-│   ├── globals.css
-│   ├── layout.tsx
-│   ├── page.tsx              # Main page component
-│   └── api/
-│       └── recommend/
-│           └── route.ts      # API route for recommendations
-├── components/
-│   ├── PersonalityQuiz.tsx   # Personality assessment
-│   ├── DestinationInput.tsx  # Destination input
-│   └── PlaceCard.tsx         # Individual place display
-└── lib/
-    └── claude.ts             # Claude API client
-```
-
-## API Endpoints
-
-### POST /api/recommend
-
-Generates travel recommendations based on personality and destination.
-
-**Request Body:**
-
-```json
-{
-  "answers": [
-    {"questionId": 1, "value": 4},
-    {"questionId": 2, "value": "Active"},
-    ...
-  ],
-  "place": "Tokyo, Japan"
-}
-```
-
-**Response:** Returns JSON array of place objects:
-
-```json
-[
-  {
-    "name": "Place Name",
-    "city": "City",
-    "country": "Country",
-    "description": "...",
-    "idealFor": "..."
-  }
-]
-```
-
-## Deployment
-
-The app is configured for deployment on Vercel:
-
-1. Push to GitHub
-2. Connect repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy automatically on push to main
-
-## Development
+Run the worker in a second terminal if you want delivery retries locally:
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
+npm run worker
 ```
 
-## Future Enhancements
+You will also need:
 
-- Mapbox integration for interactive maps
-- User authentication and saved preferences
-- Caching layer for recommendations
-- A/B testing with PostHog
-- Database integration with Supabase
+- a reachable Postgres database
+- a `.env.local` or `.env` with the required runtime values
+- guide assets in `data/guides`
 
-## License
+The bot/webhook logic is implemented, but Telegram and Tribute won’t call your local machine unless you expose it publicly and register the webhook URLs.
 
-MIT
+## Tribute + Telegram Flow
+
+1. User opens the bot from Instagram with a deep link like `t.me/<bot>?start=ig_<alias>`.
+2. Bot shows the matching guide card with preview and buy actions.
+3. User clicks the Tribute payment link.
+4. Tribute sends a signed webhook to `POST /api/tribute/webhook`.
+5. The app stores the purchase, enqueues delivery, and tries to send `full.pdf` to the buyer.
+6. If delivery fails because the user has not started the bot or blocked it, the purchase stays pending and is retried later or after the next `/start`.
+
+## NPM Scripts
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run worker
+npm run lint
+npm test -- --runInBand
+```
+
+## VPS Deployment
+
+The production stack is:
+
+- `web`: Next.js app
+- `worker`: queue processor
+- `postgres`: local Postgres 16
+- `caddy`: HTTPS reverse proxy
+
+Main deployment files:
+
+- [`Dockerfile`](./Dockerfile)
+- [`docker-compose.yml`](./docker-compose.yml)
+- [`Caddyfile`](./Caddyfile)
+- [`scripts/worker.mjs`](./scripts/worker.mjs)
+
+Typical VPS flow:
+
+1. Provision a VPS with Docker and Docker Compose.
+2. Create host directories for guide assets and backups, for example:
+   - `/srv/travel-guide/data/guides`
+   - `/srv/travel-guide/data/backups`
+3. Copy the repo to the VPS.
+4. Create `.env` from `env.example`.
+5. Put real guide assets on disk.
+6. Start the stack:
+
+```bash
+docker compose up -d --build
+```
+
+7. Register the Telegram webhook against:
+
+```text
+https://<your-domain>/api/telegram/webhook
+```
+
+8. Register the Tribute webhook against:
+
+```text
+https://<your-domain>/api/tribute/webhook
+```
+
+## Backups
+
+Host-side backup helpers:
+
+- [`scripts/backup.sh`](./scripts/backup.sh)
+- [`scripts/restore-db.sh`](./scripts/restore-db.sh)
+
+Backup script behavior:
+
+- creates a `pg_dump` from the local Postgres container
+- stores the latest dump under `data/backups/postgres`
+- sends the latest dump and guide assets to Restic
+- prunes old snapshots with daily/weekly/monthly retention
+
+Example cron usage on the VPS:
+
+```bash
+bash /srv/travel-guide/app/scripts/backup.sh
+```
+
+## Testing
+
+Run:
+
+```bash
+npm test -- --runInBand
+npm run lint
+npm run build
+```
+
+Current tests cover:
+
+- catalog helpers
+- Tribute webhook helpers
+- Claude response parsing and fallback behavior
+- basic Jest setup smoke test
+
+## Operational Notes
+
+- Tribute product IDs and payment links are configured in [`src/lib/catalog.ts`](./src/lib/catalog.ts).
+- The app creates database tables lazily at runtime in [`src/lib/db.ts`](./src/lib/db.ts). There is no separate migration tool yet.
+- `/ops` is intentionally dynamic and reads live purchase/job state from Postgres.
+- Refund webhooks mark purchases as refunded, but access revocation is intentionally simple in v1 because PDFs are delivered as files.

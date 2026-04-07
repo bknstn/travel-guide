@@ -1,0 +1,79 @@
+services:
+  web:
+    build: &app_build
+      context: .
+      dockerfile: Dockerfile
+    image: travel-guide-bot:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      GUIDES_ROOT: /data/guides
+    expose:
+      - '3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data/guides:/data/guides:ro
+      - ./data/backups:/data/backups
+
+  worker:
+    build: *app_build
+    image: travel-guide-bot:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      WORKER_POLL_INTERVAL_MS: 30000
+      GUIDES_ROOT: /data/guides
+      WORKER_TASK_COMMAND: npm run worker
+    command: ['node', 'scripts/worker.mjs']
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data/guides:/data/guides:ro
+      - ./data/backups:/data/backups
+
+  postgres:
+    image: postgres:16-bookworm
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-travel_guide}
+      POSTGRES_USER: ${POSTGRES_USER:-travel_guide}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./data/backups:/backups
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-travel_guide} -d ${POSTGRES_DB:-travel_guide}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  caddy-data:
+  caddy-config:

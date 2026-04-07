@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['@anthropic-ai/sdk'],
+  output: 'standalone',
+  serverExternalPackages: ['@anthropic-ai/sdk', 'pg'],
 };
 
 export default nextConfig;
