@@ -1,8 +1,6 @@
 import { Pool } from 'pg';
 
 import {
-  BotUserRecord,
-  BotUserState,
   DeliveryJobRecord,
   PurchaseRecord,
   PurchaseStatus,
@@ -155,7 +153,13 @@ export async function ensureSchema() {
   await global.__travelGuideSchemaPromise;
 }
 
-export async function upsertBotUser(user: Omit<BotUserRecord, 'state'> & { state?: BotUserState }) {
+export async function upsertBotUser(user: {
+  telegramUserId: number;
+  username?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  locale?: string | null;
+}) {
   if (!isDatabaseConfigured()) {
     return;
   }
@@ -189,46 +193,8 @@ export async function upsertBotUser(user: Omit<BotUserRecord, 'state'> & { state
       user.firstName ?? null,
       user.lastName ?? null,
       user.locale ?? null,
-      user.state ?? null,
+      null,
     ]
-  );
-}
-
-export async function getBotUserState(telegramUserId: number) {
-  if (!isDatabaseConfigured()) {
-    return 'idle' as BotUserState;
-  }
-
-  await ensureSchema();
-  const pool = getPool();
-  const result = await pool.query(
-    'SELECT state FROM bot_users WHERE telegram_user_id = $1',
-    [telegramUserId]
-  );
-
-  return (result.rows[0]?.state as BotUserState | undefined) ?? 'idle';
-}
-
-export async function setBotUserState(
-  telegramUserId: number,
-  state: BotUserState
-) {
-  if (!isDatabaseConfigured()) {
-    return;
-  }
-
-  await ensureSchema();
-  const pool = getPool();
-  await pool.query(
-    `
-      INSERT INTO bot_users (telegram_user_id, state)
-      VALUES ($1, $2)
-      ON CONFLICT (telegram_user_id) DO UPDATE SET
-        state = EXCLUDED.state,
-        last_seen_at = NOW(),
-        updated_at = NOW()
-    `,
-    [telegramUserId, state]
   );
 }
 

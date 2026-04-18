@@ -1,5 +1,3 @@
-export type BotUserState = 'idle' | 'awaiting_ai_brief';
-
 export type PurchaseStatus =
   | 'paid'
   | 'fulfilled'
@@ -29,11 +27,6 @@ export interface GuideCatalogItem {
   curatorSynopsis: string;
 }
 
-export interface GuideRecommendation {
-  slug: string;
-  reason: string;
-}
-
 export interface TributePurchasePayload {
   product_id: number;
   product_name?: string;
@@ -54,15 +47,6 @@ export interface TributeWebhookEvent {
   created_at: string;
   sent_at: string;
   payload: TributePurchasePayload;
-}
-
-export interface BotUserRecord {
-  telegramUserId: number;
-  username?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  locale?: string | null;
-  state: BotUserState;
 }
 
 export interface PurchaseRecord {

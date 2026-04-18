@@ -1,11 +1,11 @@
 # VPS-Hosted Telegram Guide Bot with Tribute
 
 ## Summary
-- Pivot the repo from the current recommendation web app into a Telegram-first commerce bot for Russian-speaking users arriving from Instagram deep links.
+- Pivot the repo from the current web app into a Telegram-first commerce bot for Russian-speaking users arriving from Instagram deep links.
 - Use `Next.js 15 + TypeScript` for the app shell, Telegram webhook endpoints, small public pages, and a minimal ops UI.
 - Use `grammy` for bot logic, `Postgres` on the VPS for runtime state, and the VPS filesystem for guide assets.
 - Use `Tribute` for payments in v1. Do not add Stripe now; keep it as a later option for a separate web storefront.
-- Use `Claude` only for optional guide selection/Q&A. Keep discovery, purchase, and fulfillment deterministic and button-driven.
+- Keep discovery, purchase, and fulfillment deterministic and button-driven.
 
 ## Architecture
 - Deploy on the VPS with `Docker Compose` and four services:
@@ -25,21 +25,19 @@
   - a minimal landing page with “Open in Telegram”
   - public `support` and `privacy` pages
   - an ops page for purchases and retries
-- Catalog is code-managed. Each guide has metadata plus three local assets:
+- Catalog is code-managed. Each guide has metadata plus two local assets:
   - `cover.jpg`
-  - `preview.pdf`
   - `full.pdf`
-- Store guide metadata in code with: `slug`, Russian title, short sales copy, tags, destination, price label, Tribute product ID, Tribute payment URL, Instagram deep-link alias, and a short curator-written synopsis for AI.
+- Store guide metadata in code with: `slug`, Russian title, short sales copy, tags, destination, price label, Tribute product ID, Tribute payment URL, Instagram deep-link alias, and a short curator-written synopsis.
 - Instagram links should use Telegram deep links like `t.me/<bot>?start=ig_<slug>`.
 - Launch UX:
   - `/start` opens main menu
   - guide-specific deep links open that guide directly
-  - buttons: `Каталог`, `Смотреть превью`, `Купить`, `Мои покупки`, `Помочь выбрать`, `Поддержка`
-- Preview flow:
+  - buttons: `Каталог`, `Оплатить`, `Скачать PDF`, `Мои покупки`, `Поддержка`
   - send cover + short copy + price
-  - `Смотреть превью` sends the local `preview.pdf`
 - Purchase flow:
-  - `Купить` opens the Tribute payment URL for that guide
+  - `Оплатить` opens the Tribute payment URL for that guide
+  - each payment covers exactly one guide; there is no cart or multi-guide checkout
   - Tribute webhook confirms payment
   - worker sends `full.pdf` to the buyer in DM via `sendDocument`
 - Post-payment behavior:
@@ -47,11 +45,6 @@
   - if Telegram delivery fails because the user has not started the bot or blocked it, mark `awaiting_bot_start`
   - on the next `/start`, re-check pending purchases and deliver automatically
   - `Мои покупки` re-sends previously purchased guides on demand
-- AI behavior:
-  - only enabled in `Помочь выбрать`
-  - Claude receives catalog metadata and curator-written guide synopses; no PDF parsing or vector DB in v1
-  - AI returns a structured shortlist; the app renders the actual buttons from catalog data only
-  - if AI fails, fall back to deterministic tag-based matching
 
 ## Interfaces and Data
 - Telegram commands: `/start`, `/catalog`, `/my_guides`, `/paysupport`
@@ -65,13 +58,12 @@
   - Tribute webhook verifies `trbt-signature` HMAC using the Tribute API key
   - all webhook processing is idempotent by external event key / purchase ID
 - Required env vars:
-  - `APP_BASE_URL`
+  - `APP_DOMAIN`
   - `TELEGRAM_BOT_TOKEN`
   - `TELEGRAM_BOT_USERNAME`
   - `TELEGRAM_WEBHOOK_SECRET`
   - `TRIBUTE_API_KEY`
   - `DATABASE_URL`
-  - `ANTHROPIC_API_KEY`
   - `OPS_BASIC_AUTH_USER`
   - `OPS_BASIC_AUTH_PASSWORD`
   - `RESTIC_REPOSITORY`
@@ -102,16 +94,13 @@
   - delivery state transitions
 - Integration tests for:
   - Instagram deep link -> guide detail message
-  - preview send
   - Tribute payment webhook -> single purchase row -> single PDF delivery
   - duplicate Tribute webhook does not duplicate delivery
   - failed delivery becomes `awaiting_bot_start` and is delivered on the next `/start`
   - `Мои покупки` re-delivers owned guides only
-  - AI failure falls back to deterministic recommendations
 - Manual acceptance:
   - generic `/start`
   - guide deep link from Instagram
-  - preview PDF received
   - real low-price purchase through Tribute
   - full PDF arrives in DM
   - refunds/support flow is visible in ops
@@ -119,7 +108,7 @@
 ## Assumptions and Defaults
 - v1 is Russian-only.
 - Guide count stays under 20, so a code-managed catalog is enough.
-- Full PDFs stay under 50 MB, so Telegram DM delivery is viable.
+- Full PDFs stay under 50 MB, so Telegram chat delivery is viable.
 - Tribute products are created manually in the Tribute dashboard; IDs and payment URLs are then added to the catalog config.
 - Direct PDF delivery is the fulfillment model; channel-based access is out of scope.
 - Stripe is intentionally deferred until there is a separate need for a non-Telegram checkout path.

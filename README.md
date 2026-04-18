@@ -3,9 +3,9 @@
 Telegram bot for selling travel guide PDFs with:
 
 - Instagram deep links into the bot
-- free preview PDFs before purchase
+- one Tribute payment per guide
 - Tribute payment links and webhook confirmation
-- automatic PDF delivery in Telegram DM
+- automatic PDF delivery in Telegram chat
 - a small ops page for purchase and delivery retries
 - VPS-first deployment with local Postgres and offsite backups
 
@@ -17,7 +17,6 @@ The product/infra plan is documented in [travel-guide-bot.md](./travel-guide-bot
 - `TypeScript`
 - `grammy` for Telegram bot handling
 - `Postgres` via `pg`
-- `Anthropic Claude` for optional guide selection help
 - `Docker Compose + Caddy` for VPS deployment
 
 ## What’s In The Repo
@@ -57,7 +56,6 @@ src/
 ├── lib/
 │   ├── bot.ts
 │   ├── catalog.ts
-│   ├── claude.ts
 │   ├── db.ts
 │   ├── delivery.ts
 │   ├── guide-assets.ts
@@ -75,7 +73,6 @@ Each guide expects a local folder:
 ```text
 data/guides/<slug>/
 ├── cover.jpg
-├── preview.pdf
 └── full.pdf
 ```
 
@@ -85,7 +82,7 @@ At runtime the app reads assets from:
 - otherwise `GUIDE_ASSETS_DIR`
 - otherwise `./data/guides`
 
-If preview/full files are missing, Telegram delivery will fail for that guide.
+If `full.pdf` is missing, Telegram delivery will fail for that guide.
 
 ## Environment Variables
 
@@ -93,14 +90,12 @@ Copy `env.example` to `.env` for Docker/VPS deployment.
 
 Main variables:
 
-- `APP_BASE_URL`
 - `APP_DOMAIN`
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_BOT_USERNAME`
 - `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME`
 - `TELEGRAM_WEBHOOK_SECRET`
 - `TRIBUTE_API_KEY`
-- `ANTHROPIC_API_KEY`
 - `SUPPORT_EMAIL`
 - `NEXT_PUBLIC_SUPPORT_EMAIL`
 - `DATABASE_URL`
@@ -110,6 +105,7 @@ Main variables:
 - `GUIDES_ROOT`
 - `GUIDE_ASSETS_DIR`
 - `BACKUP_OUTPUT_DIR`
+- `CADDY_EMAIL`
 - `OPS_BASIC_AUTH_USER`
 - `OPS_BASIC_AUTH_PASSWORD`
 - `RESTIC_REPOSITORY`
@@ -119,7 +115,6 @@ Main variables:
 
 Notes:
 
-- `ANTHROPIC_API_KEY` is optional if you want the bot’s “help me choose” flow to use Claude. Without it, the app falls back to deterministic matching.
 - `OPS_BASIC_AUTH_USER` and `OPS_BASIC_AUTH_PASSWORD` protect `/ops` through [`middleware.ts`](./middleware.ts).
 - `NEXT_PUBLIC_*` values are for public page links/text. Server runtime still uses the non-public variables.
 
@@ -154,7 +149,7 @@ The bot/webhook logic is implemented, but Telegram and Tribute won’t call your
 ## Tribute + Telegram Flow
 
 1. User opens the bot from Instagram with a deep link like `t.me/<bot>?start=ig_<alias>`.
-2. Bot shows the matching guide card with preview and buy actions.
+2. Bot shows the matching guide card and starts a single-guide checkout flow.
 3. User clicks the Tribute payment link.
 4. Tribute sends a signed webhook to `POST /api/tribute/webhook`.
 5. The app stores the purchase, enqueues delivery, and tries to send `full.pdf` to the buyer.
@@ -248,12 +243,11 @@ Current tests cover:
 
 - catalog helpers
 - Tribute webhook helpers
-- Claude response parsing and fallback behavior
-- basic Jest setup smoke test
+- landing page messaging for the single-guide checkout flow
 
 ## Operational Notes
 
-- Tribute product IDs and payment links are configured in [`src/lib/catalog.ts`](./src/lib/catalog.ts).
+- Tribute product IDs and payment links are configured in [`src/lib/catalog.ts`](./src/lib/catalog.ts), with one product/payment URL per guide.
 - The app creates database tables lazily at runtime in [`src/lib/db.ts`](./src/lib/db.ts). There is no separate migration tool yet.
 - `/ops` is intentionally dynamic and reads live purchase/job state from Postgres.
 - Refund webhooks mark purchases as refunded, but access revocation is intentionally simple in v1 because PDFs are delivered as files.

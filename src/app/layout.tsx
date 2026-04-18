@@ -4,7 +4,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Travel Guide Bot',
   description:
-    'Telegram-бот с платными PDF-гайдами по путешествиям, превью и быстрой оплатой через Tribute.',
+    'Telegram-бот с платными PDF-гайдами по путешествиям, оплатой через Tribute и доставкой файла прямо в чат.',
 };
 
 export default function RootLayout({

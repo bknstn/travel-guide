@@ -10,15 +10,12 @@ import {
   getGuideBySlug,
   getGuideByStartParam,
 } from '@/lib/catalog';
-import { recommendGuidesFromBrief } from '@/lib/claude';
 import {
-  getBotUserState,
   listUserPurchases,
   recoverPendingDeliveriesForUser,
-  setBotUserState,
   upsertBotUser,
 } from '@/lib/db';
-import { processDeliveryQueue, redeliverOwnedGuide, sendGuideDocument } from '@/lib/delivery';
+import { processDeliveryQueue, redeliverOwnedGuide } from '@/lib/delivery';
 import { getGuideAssetPath, guideAssetExists } from '@/lib/guide-assets';
 
 declare global {
@@ -31,17 +28,37 @@ function mainMenuKeyboard() {
     .text('Каталог', 'menu:catalog')
     .text('Мои покупки', 'menu:my-guides')
     .row()
-    .text('Помочь выбрать', 'help:choose')
     .text('Поддержка', 'menu:support');
 }
 
-function guideKeyboard(slug: string, tributePaymentUrl: string) {
-  return new InlineKeyboard()
-    .text('Смотреть превью', `preview:${slug}`)
-    .url('Купить', tributePaymentUrl)
-    .row()
-    .text('Каталог', 'menu:catalog')
-    .text('Помочь выбрать', 'help:choose');
+async function buildGuideKeyboard(
+  telegramUserId: number | undefined,
+  slug: string,
+  tributePaymentUrl: string
+) {
+  const ownsGuide = telegramUserId
+    ? (await listUserPurchases(telegramUserId)).some(
+        (purchase) => purchase.guideSlug === slug
+      )
+    : false;
+
+  const keyboard = new InlineKeyboard();
+
+  if (ownsGuide) {
+    keyboard.text('Скачать PDF', `library:${slug}`);
+  } else {
+    keyboard.url('Оплатить', tributePaymentUrl);
+  }
+
+  keyboard.row().text('Каталог', 'menu:catalog');
+
+  if (ownsGuide) {
+    keyboard.text('Мои покупки', 'menu:my-guides');
+  } else {
+    keyboard.text('Поддержка', 'menu:support');
+  }
+
+  return { keyboard, ownsGuide };
 }
 
 function catalogKeyboard() {
@@ -51,7 +68,7 @@ function catalogKeyboard() {
     keyboard.text(guide.title, `guide:${guide.slug}`).row();
   });
 
-  keyboard.text('Помочь выбрать', 'help:choose').text('Мои покупки', 'menu:my-guides');
+  keyboard.text('Мои покупки', 'menu:my-guides').text('Поддержка', 'menu:support');
   return keyboard;
 }
 
@@ -83,7 +100,7 @@ async function sendMainMenu(ctx: Context) {
     [
       'Готово. Это бот с PDF-гайдами по поездкам.',
       '',
-      'Здесь можно открыть превью, оплатить нужный гайд через Tribute и получить полный PDF прямо в этот чат.',
+      'Здесь можно выбрать нужный гайд, оплатить его через Tribute и получить PDF прямо в этот чат.',
     ].join('\n'),
     {
       reply_markup: mainMenuKeyboard(),
@@ -112,6 +129,12 @@ async function sendGuideCard(ctx: Context, slug: string) {
     return;
   }
 
+  const { keyboard, ownsGuide } = await buildGuideKeyboard(
+    ctx.from?.id,
+    guide.slug,
+    guide.tributePaymentUrl
+  );
+
   const text = [
     `${guide.title}`,
     `${guide.destination}`,
@@ -119,19 +142,21 @@ async function sendGuideCard(ctx: Context, slug: string) {
     guide.fullDescription,
     '',
     `Цена: ${guide.priceLabel}`,
-    'После оплаты PDF будет доставлен сюда автоматически.',
+    ownsGuide
+      ? 'Этот PDF уже есть в ваших покупках. Можно скачать его снова ниже.'
+      : 'Один платеж = один гайд. После оплаты PDF будет доставлен сюда автоматически.',
   ].join('\n');
 
   if (guideAssetExists(guide, 'cover')) {
     await ctx.replyWithPhoto(new InputFile(getGuideAssetPath(guide, 'cover')), {
       caption: text,
-      reply_markup: guideKeyboard(guide.slug, guide.tributePaymentUrl),
+      reply_markup: keyboard,
     });
     return;
   }
 
   await ctx.reply(text, {
-    reply_markup: guideKeyboard(guide.slug, guide.tributePaymentUrl),
+    reply_markup: keyboard,
   });
 }
 
@@ -161,50 +186,6 @@ async function sendMyGuides(ctx: Context) {
   });
 }
 
-async function sendGuidePreview(ctx: Context, slug: string) {
-  const guide = getGuideBySlug(slug);
-
-  if (!guide) {
-    await ctx.reply('Не удалось найти превью для этого гайда.');
-    return;
-  }
-
-  try {
-    await sendGuideDocument(ctx.api, ctx.chat!.id, slug, 'preview');
-  } catch (error) {
-    await ctx.reply(
-      error instanceof Error
-        ? error.message
-        : 'Не удалось отправить превью. Попробуйте позже.'
-    );
-  }
-}
-
-async function handleGuideSelectionHelp(ctx: Context, userBrief: string) {
-  const recommendations = await recommendGuidesFromBrief(userBrief);
-
-  if (recommendations.length === 0) {
-    await ctx.reply('Пока не получилось подобрать гайд. Попробуйте описать поездку чуть подробнее.', {
-      reply_markup: mainMenuKeyboard(),
-    });
-    return;
-  }
-
-  for (const item of recommendations) {
-    const guide = getGuideBySlug(item.slug);
-    if (!guide) {
-      continue;
-    }
-
-    await ctx.reply(
-      [`${guide.title}`, item.reason, `Цена: ${guide.priceLabel}`].join('\n\n'),
-      {
-        reply_markup: guideKeyboard(guide.slug, guide.tributePaymentUrl),
-      }
-    );
-  }
-}
-
 function registerBot(bot: Bot<Context>) {
   bot.use(async (ctx, next) => {
     if (ctx.from) {
@@ -224,7 +205,6 @@ function registerBot(bot: Bot<Context>) {
     const payload = ctx.message?.text?.split(/\s+/, 2)[1] ?? null;
 
     if (ctx.from) {
-      await setBotUserState(ctx.from.id, 'idle');
       await recoverPendingDeliveriesForUser(ctx.from.id);
       await processDeliveryQueue(ctx.api, {
         limit: 5,
@@ -267,29 +247,9 @@ function registerBot(bot: Bot<Context>) {
     });
   });
 
-  bot.callbackQuery('help:choose', async (ctx) => {
-    await ctx.answerCallbackQuery();
-
-    if (ctx.from) {
-      await setBotUserState(ctx.from.id, 'awaiting_ai_brief');
-    }
-
-    await ctx.reply(
-      'Опишите, что вы хотите от поездки: темп, город, настроение, бюджет, еда, районы. Я предложу подходящие гайды.',
-      {
-        reply_markup: new InlineKeyboard().text('Каталог', 'menu:catalog'),
-      }
-    );
-  });
-
   bot.callbackQuery(/^guide:(.+)$/, async (ctx) => {
     await ctx.answerCallbackQuery();
     await sendGuideCard(ctx, ctx.match[1]);
-  });
-
-  bot.callbackQuery(/^preview:(.+)$/, async (ctx) => {
-    await ctx.answerCallbackQuery();
-    await sendGuidePreview(ctx, ctx.match[1]);
   });
 
   bot.callbackQuery(/^library:(.+)$/, async (ctx) => {
@@ -311,22 +271,13 @@ function registerBot(bot: Bot<Context>) {
   });
 
   bot.on('message:text', async (ctx) => {
-    const text = ctx.message.text.trim();
-    if (!ctx.from || text.startsWith('/')) {
+    if (!ctx.from || ctx.message.text.trim().startsWith('/')) {
       return;
     }
 
-    const state = await getBotUserState(ctx.from.id);
-
-    if (state !== 'awaiting_ai_brief') {
-      await ctx.reply('Используйте кнопки ниже, чтобы открыть каталог или посмотреть покупки.', {
-        reply_markup: mainMenuKeyboard(),
-      });
-      return;
-    }
-
-    await setBotUserState(ctx.from.id, 'idle');
-    await handleGuideSelectionHelp(ctx, text);
+    await ctx.reply('Используйте кнопки ниже, чтобы открыть каталог, посмотреть покупки или написать в поддержку.', {
+      reply_markup: mainMenuKeyboard(),
+    });
   });
 }
 

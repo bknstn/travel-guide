@@ -19,21 +19,16 @@ export function getGuideDirectory(guide: GuideCatalogItem) {
 
 export function getGuideAssetPath(
   guide: GuideCatalogItem,
-  asset: 'cover' | 'preview' | 'full'
+  asset: 'cover' | 'pdf'
 ) {
-  const fileName =
-    asset === 'cover'
-      ? 'cover.jpg'
-      : asset === 'preview'
-        ? 'preview.pdf'
-        : 'full.pdf';
+  const fileName = asset === 'cover' ? 'cover.jpg' : 'full.pdf';
 
   return path.join(getGuideDirectory(guide), fileName);
 }
 
 export function guideAssetExists(
   guide: GuideCatalogItem,
-  asset: 'cover' | 'preview' | 'full'
+  asset: 'cover' | 'pdf'
 ) {
   return fs.existsSync(getGuideAssetPath(guide, asset));
 }

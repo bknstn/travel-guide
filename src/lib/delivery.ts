@@ -56,35 +56,25 @@ function getRetryDelayMinutes(attempts: number) {
 export async function sendGuideDocument(
   api: Api,
   telegramUserId: number,
-  guideSlug: string,
-  mode: 'preview' | 'full'
+  guideSlug: string
 ) {
   const guide = getGuideBySlug(guideSlug);
   if (!guide) {
     throw new Error(`Unknown guide: ${guideSlug}`);
   }
 
-  if (!guideAssetExists(guide, mode === 'preview' ? 'preview' : 'full')) {
-    throw new Error(`Missing ${mode} asset for ${guide.slug}`);
+  if (!guideAssetExists(guide, 'pdf')) {
+    throw new Error(`Missing pdf asset for ${guide.slug}`);
   }
 
-  const assetPath = getGuideAssetPath(
-    guide,
-    mode === 'preview' ? 'preview' : 'full'
-  );
+  const assetPath = getGuideAssetPath(guide, 'pdf');
 
   return api.sendDocument(telegramUserId, new InputFile(assetPath), {
-    caption:
-      mode === 'preview'
-        ? `Превью гайда «${guide.title}».\n\nПолную версию можно купить через Tribute.`
-        : deliveryCaption(guide.title),
-    reply_markup:
-      mode === 'full'
-        ? new InlineKeyboard().text('Мои покупки', 'menu:my-guides').row().text(
-            'Каталог',
-            'menu:catalog'
-          )
-        : undefined,
+    caption: deliveryCaption(guide.title),
+    reply_markup: new InlineKeyboard()
+      .text('Мои покупки', 'menu:my-guides')
+      .row()
+      .text('Каталог', 'menu:catalog'),
   });
 }
 
@@ -111,8 +101,7 @@ export async function processDeliveryQueue(
       const response = await sendGuideDocument(
         api,
         purchase.telegramUserId,
-        purchase.guideSlug,
-        'full'
+        purchase.guideSlug
       );
 
       await markPurchaseFulfilled(purchase.id, response.message_id);
@@ -159,5 +148,5 @@ export async function redeliverOwnedGuide(
     throw new Error('Guide not owned by user');
   }
 
-  return sendGuideDocument(api, telegramUserId, guideSlug, 'full');
+  return sendGuideDocument(api, telegramUserId, guideSlug);
 }

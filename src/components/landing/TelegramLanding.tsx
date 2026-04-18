@@ -8,12 +8,12 @@ const steps = [
     text: 'Переходите из Instagram по прямой ссылке и выбираете нужный город или страну.',
   },
   {
-    title: 'Смотрите превью',
-    text: 'Получаете бесплатный фрагмент PDF, чтобы понять стиль, глубину и формат гайда.',
+    title: 'Выбираете один гайд',
+    text: 'Каждый платеж привязан к одному PDF-гайду без корзины и без промежуточного превью.',
   },
   {
-    title: 'Оплачиваете и скачиваете',
-    text: 'После Tribute бот отправляет полный PDF в личку или показывает ссылку на загрузку.',
+    title: 'Оплачиваете и получаете PDF',
+    text: 'После Tribute бот отправляет купленный PDF прямо в этот чат Telegram.',
   },
 ];
 
@@ -64,7 +64,7 @@ export default function TelegramLanding() {
           <div className="space-y-8">
             <div className="space-y-5">
               <span className="inline-flex w-fit items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm text-[color:var(--secondary)] shadow-sm backdrop-blur">
-                Гайды в PDF, превью перед оплатой, доставка в Telegram
+                Гайды в PDF, оплата по одному гайду, доставка в Telegram
               </span>
 
               <div className="space-y-4">
@@ -72,8 +72,9 @@ export default function TelegramLanding() {
                   Путеводители, которые покупают прямо из Telegram.
                 </h2>
                 <p className="max-w-2xl text-base leading-7 text-[color:var(--secondary)] sm:text-lg">
-                  Русскоязычный бот для продаж тревел-гайдов: короткое превью, быстрая
-                  оплата через Tribute и мгновенная выдача PDF после успешного платежа.
+                  Русскоязычный бот для продаж тревел-гайдов: выбор нужного PDF,
+                  быстрая оплата через Tribute и мгновенная выдача файла после успешного
+                  платежа.
                 </p>
               </div>
             </div>
@@ -89,8 +90,8 @@ export default function TelegramLanding() {
 
             <dl className="grid gap-4 sm:grid-cols-3">
               <Stat label="До 20 гидов" value="Лёгкий каталог" />
-              <Stat label="Preview first" value="PDF-фрагмент" />
-              <Stat label="Delivery" value="В личку" />
+              <Stat label="Checkout" value="1 гайд = 1 платеж" />
+              <Stat label="Delivery" value="В чат" />
             </dl>
           </div>
 
@@ -99,7 +100,7 @@ export default function TelegramLanding() {
               <div>
                 <p className="text-sm text-[color:var(--secondary)]">Как выглядит продажа</p>
                 <p className="text-xl font-semibold text-[color:var(--foreground)]">
-                  Гайд + превью + оплата
+                  Гайд + оплата + доставка
                 </p>
               </div>
               <span className="rounded-full bg-[color:var(--accent)]/10 px-3 py-1 text-xs font-semibold text-[color:var(--accent)]">
@@ -116,7 +117,7 @@ export default function TelegramLanding() {
                   <div>
                     <p className="font-semibold text-[color:var(--foreground)]">Тбилиси на 3 дня</p>
                     <p className="text-sm text-[color:var(--secondary)]">
-                      Превью, карта маршрута и практические советы
+                      Маршрут, карта и практические советы в одном PDF
                     </p>
                   </div>
                   <p className="text-sm font-semibold text-[color:var(--accent)]">9 €</p>
@@ -124,9 +125,9 @@ export default function TelegramLanding() {
                 <div className="rounded-2xl bg-[color:var(--background)]/70 p-3 text-sm text-[color:var(--secondary)]">
                   1. Открыть бот
                   <br />
-                  2. Посмотреть preview.pdf
+                  2. Выбрать один гайд
                   <br />
-                  3. Оплатить и получить full.pdf
+                  3. Оплатить и получить PDF в чат
                 </div>
               </div>
             </div>
@@ -134,7 +135,7 @@ export default function TelegramLanding() {
             <div className="grid gap-3 sm:grid-cols-2">
               <InfoPill title="Оплата" text="Tribute checkout" />
               <InfoPill title="Формат" text="PDF для телефона" />
-              <InfoPill title="Доставка" text="Telegram DM" />
+              <InfoPill title="Доставка" text="Telegram чат" />
               <InfoPill title="Поддержка" text={supportEmail} />
             </div>
           </div>
@@ -167,7 +168,9 @@ export default function TelegramLanding() {
                   {guide.summary}
                 </p>
                 <div className="mt-5 flex items-center justify-between border-t border-[color:var(--border)] pt-4">
-                  <span className="text-sm text-[color:var(--secondary)]">Preview доступен</span>
+                  <span className="text-sm text-[color:var(--secondary)]">
+                    Один платеж за один гайд
+                  </span>
                   <span className="text-lg font-semibold text-[color:var(--accent)]">
                     {guide.price}
                   </span>
@@ -211,11 +214,11 @@ export default function TelegramLanding() {
                 предсказуемый сценарий без лишних шагов.
               </p>
               <p>
-                Превью PDF снижает риск покупки “вслепую”, а Tribute убирает ручную
-                обработку платежей.
+                Каждый Tribute-платеж соответствует одному гайду, поэтому checkout остаётся
+                простым и понятным.
               </p>
               <p>
-                После оплаты бот может сразу выдать полный файл в личные сообщения,
+                После оплаты бот сразу выдаёт PDF в чат Telegram,
                 поэтому продажа не зависит от внешнего сайта.
               </p>
             </div>
